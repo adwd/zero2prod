@@ -27,7 +27,7 @@ uuid = { version = "0.8.2", features = ["v4"] }
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
-version = "0.5.7"
+version = "0.5.10"
 default-features = false
 features = [
     "runtime-actix-rustls", 
