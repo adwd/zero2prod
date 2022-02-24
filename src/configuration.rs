@@ -1,26 +1,26 @@
+use crate::domain::SubscriberEmail;
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use sqlx::postgres::{PgConnectOptions, PgSslMode};
 use sqlx::ConnectOptions;
+use std::convert::{TryFrom, TryInto};
 
-use crate::domain::SubscriberEmail;
-
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
-    // New field!
     pub email_client: EmailClientSettings,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct ApplicationSettings {
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
 }
-#[derive(Deserialize)]
+
+#[derive(Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: Secret<String>,
@@ -28,17 +28,14 @@ pub struct DatabaseSettings {
     pub port: u16,
     pub host: String,
     pub database_name: String,
-    // Determine if we demand the connection to be encrypted or not
     pub require_ssl: bool,
 }
 
 impl DatabaseSettings {
-    // Renamed from `connection_string_without_db`
     pub fn without_db(&self) -> PgConnectOptions {
         let ssl_mode = if self.require_ssl {
             PgSslMode::Require
         } else {
-            // Try an encrypted connection, fallback to unencrypted if it fails
             PgSslMode::Prefer
         };
         PgConnectOptions::new()
@@ -56,7 +53,7 @@ impl DatabaseSettings {
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct EmailClientSettings {
     pub base_url: String,
     pub sender_email: String,
@@ -78,11 +75,18 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let mut settings = config::Config::default();
     let base_path = std::env::current_dir().expect("Failed to determine the current directory");
     let configuration_directory = base_path.join("configuration");
+
+    // Read the "default" configuration file
     settings.merge(config::File::from(configuration_directory.join("base")).required(true))?;
+
+    // Detect the running environment.
+    // Default to `local` if unspecified.
     let environment: Environment = std::env::var("APP_ENVIRONMENT")
         .unwrap_or_else(|_| "local".into())
         .try_into()
         .expect("Failed to parse APP_ENVIRONMENT.");
+
+    // Layer on the environment-specific values.
     settings.merge(
         config::File::from(configuration_directory.join(environment.as_str())).required(true),
     )?;
