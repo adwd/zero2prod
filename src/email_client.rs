@@ -49,6 +49,21 @@ impl EmailClient {
     }
 }
 
+/*
+{
+    "personalizations": [
+        {"to": [
+            {"email": "exapmle@exapmle.com"}
+        ]}
+    ],
+    "from": { "email": "exapmle@exapmle.com},
+    "subject": "Sending with SendGrid is Fun",
+    "content": [
+        {"type": "text/plain", "value": "and easy to do anywhere, even with cURL"}
+    ]
+}
+*/
+
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SendEmailRequest {
     pub personalizations: Vec<Personalization>,

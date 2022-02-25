@@ -38,6 +38,7 @@ validator = "0.14.0"
 fake = "~2.3"
 quickcheck = "0.9"
 quickcheck_macros = "0.9"
+linkify = "0.8.0"
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
