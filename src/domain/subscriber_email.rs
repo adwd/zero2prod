@@ -1,6 +1,6 @@
 use validator::validate_email;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SubscriberEmail(String);
 
 impl SubscriberEmail {
@@ -19,10 +19,18 @@ impl AsRef<str> for SubscriberEmail {
     }
 }
 
+impl std::fmt::Display for SubscriberEmail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::SubscriberEmail;
     use claim::assert_err;
+    use fake::faker::internet::en::SafeEmail;
+    use fake::Fake;
 
     #[test]
     fn empty_string_is_rejected() {
@@ -42,39 +50,17 @@ mod tests {
         assert_err!(SubscriberEmail::parse(email));
     }
 
-    // We are importing the `SafeEmail` faker!
-    // We also need the `Fake` trait to get access to the
-    // `.fake` method on `SafeEmail`
-    use fake::faker::internet::en::SafeEmail;
-    use fake::Fake;
-
-    fn reverse<T: Clone>(xs: &[T]) -> Vec<T> {
-        let mut rev = vec![];
-        for x in xs {
-            rev.insert(0, x.clone())
-        }
-        rev
-    }
-
-    #[quickcheck]
-    fn double_reversal_is_identity(xs: Vec<isize>) -> bool {
-        xs == reverse(&reverse(&xs))
-    }
-
-    // Both `Clone` and `Debug` are required by `quickcheck`
     #[derive(Debug, Clone)]
     struct ValidEmailFixture(pub String);
 
-    use quickcheck::{Arbitrary, Gen};
-
-    impl Arbitrary for ValidEmailFixture {
-        fn arbitrary<G: Gen>(g: &mut G) -> Self {
+    impl quickcheck::Arbitrary for ValidEmailFixture {
+        fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
             let email = SafeEmail().fake_with_rng(g);
             Self(email)
         }
     }
 
-    #[quickcheck]
+    #[quickcheck_macros::quickcheck]
     fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
         SubscriberEmail::parse(valid_email.0).is_ok()
     }

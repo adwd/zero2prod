@@ -56,7 +56,7 @@ impl EmailClient {
             {"email": "exapmle@exapmle.com"}
         ]}
     ],
-    "from": { "email": "exapmle@exapmle.com},
+    "from": { "email": "exapmle@exapmle.com" },
     "subject": "Sending with SendGrid is Fun",
     "content": [
         {"type": "text/plain", "value": "and easy to do anywhere, even with cURL"}
