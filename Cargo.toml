@@ -43,7 +43,7 @@ rand = { version = "0.8.5", features = ["std_rng"] }
 thiserror = "1.0.30"
 anyhow = "1.0.55"
 base64 = "0.13.0"
-argon2 = { version = "0.3.4", features = ["std"] }
+argon2 = { version = "0.4.0", features = ["std"] }
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
