@@ -18,7 +18,7 @@ name = "zero2prod"
 
 [dependencies]
 actix-web = "4.0.1"
-reqwest = { version = "0.11.9", default-features = false, features = ["json", "rustls-tls"] }
+actix-web-flash-messages = { version = "0.3", features = ["cookies"] }
 serde = { version = "1.0.136", features= ["derive"] }
 tokio = { version = "1.16.1", features = ["macros", "rt-multi-thread"] }
 config = "0.12.0"
@@ -49,6 +49,11 @@ htmlescape = "0.3.1"
 hmac = { version = "0.12", features = ["std"] }
 sha2 = "0.10"
 hex = "0.4.3"
+
+[dependencies.reqwest]
+version = "0.11.9"
+default-features = false
+features = ["json", "rustls-tls", "cookies"]
 
 # Using table-like toml syntax to avoid a super-long line!
 [dependencies.sqlx]
